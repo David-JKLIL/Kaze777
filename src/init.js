@@ -138,30 +138,40 @@ function create() {
         frameRate: 10,
         repeat: -1
     });
+    this.allkeys = [];
 
+    this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    this.keyJ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+    this.keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    this.allkeys.push(this.keyA);
+    this.allkeys.push(this.keyD);
+    this.allkeys.push(this.keyJ);
+    this.allkeys.push(this.keySPACE);
 
 
     jumps = 0;
-    this.input.keyboard.on('32', jump, this);
 
     ghost.anims.play('ghostQuieto');
 
 
     this.input.keyboard.on('keydown', procesarTeclaPresionada, this);
-    this.input.keyboard.on('keyup', procesarTeclaLiberada, this);
-
+    //this.input.keyboard.on('keyup', procesarTeclaLiberada, this);
+    //console.log(this.allkeys);
 
 };
 function update(time, delta) {
-    console.log(this.input.keyboard.input);
-    const keys = this.input.keyboard.keys;
-    //cursors = this.input.keyboard.createCursorKeys();
-    var keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-    var keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    var keyJ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
-    //var keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    if (keyA.isDown) {
+    //Validar que no se precione ningun boton
+    var allKeysDown = true;
+    for (var i = 0; i < this.allkeys.length; i++) {
+        if (this.allkeys[i].isDown) {
+            allKeysDown = false;
+        }
+    }
+
+    if (this.keyA.isDown) {
         Kaze.setVelocityX(-200);
         Kaze.setFlipX(true);
         if (Kaze.body.touching.down) {
@@ -169,7 +179,7 @@ function update(time, delta) {
             Kaze.setSize(50, 68);
         }
     }
-    else if (keyD.isDown) {
+    else if (this.keyD.isDown) {
         Kaze.setVelocityX(200);
         Kaze.setFlipX(false);
         if (Kaze.body.touching.down) {
@@ -177,30 +187,15 @@ function update(time, delta) {
             Kaze.setSize(50, 68);
         }
     } else {
-        Kaze.anims.play('Quieto', true);
-        Kaze.setSize(50, 68);
-        Kaze.setVelocityX(0);
-        //console.log(Kaze.anims.play('Quieto').frame);
+        if (allKeysDown && Kaze.body.touching.down && this.anims.get('attack1').isPlaying) {
+            Kaze.anims.play('Quieto', true);
+            Kaze.setSize(50, 68);
+            Kaze.setVelocityX(0);
+        }
     }
-
-    /*if(keySpace.isDown){
-        jump();
-        
-    }*/
-
-    if (keyJ.isDown) {
-        Kaze.anims.play('attack1', true);
-        Kaze.setSize(96, 68);
-    }
-    if (game.input.keyboard == true) {
-        console.log("tocando");
-    }
-
-
 };
 
 function jump() {
-    console.log(jumps)
     if (Kaze.body.touching.down) {
         jumps = 0;
     }
@@ -212,9 +207,15 @@ function jump() {
 }
 
 function procesarTeclaPresionada(event) {
-    console.log('Se ha presionado la tecla con código: ' + event.keyCode);
+    if (event.keyCode == 32) {
+        jump();
+    }
+    else if (event.keyCode == 74) {
+        Kaze.anims.play('attack1', true);
+        Kaze.setSize(96, 68);
+    }
 }
 
 function procesarTeclaLiberada(event) {
-    console.log('Se ha liberado la tecla con código: ' + event.keyCode);
+    //console.log('Se ha liberado la tecla con código: ' + event.keyCode);
 }
